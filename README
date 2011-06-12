@@ -1,0 +1,18 @@
+rubuquet usage:
+---------------
+
+	$ ruby rubuquet.rb <src file> <language>
+
+	supported languages are:	eng, ger, fra, rus, swe, spa, ita, ruseng, ukr
+								srp, hrv, pol, dan, por, dut, cze, rum, hun
+								bul, slo, lav, lit, est, tur
+
+Dependencies:
+-------------
+
+	* ruby
+	* cuneiform
+	* ghostscript
+	* djvulibre-bin
+	* poppler-utils
+
