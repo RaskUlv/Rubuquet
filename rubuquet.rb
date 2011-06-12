@@ -37,11 +37,13 @@ def ocr_file( docPages, fileLang, tempDir, workDir, fileName )
 
   puts "\nOCR is done: #{fileName}"
   outFile = File.new("#{workDir}/#{fileName}.txt", "a+")
+
   Dir["#{tempDir}/*.txt"].each {
   |filetx|
   tempst = File.read(filetx)
   File.open("#{workDir}/#{fileName}.txt", "a+") { |file| file.write tempst }
   }
+
   FileUtils.rm_rf(tempDir)
 end
 
