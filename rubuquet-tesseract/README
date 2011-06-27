@@ -1,0 +1,26 @@
+rubuquet usage:
+---------------
+
+	$ ruby rubuquet-tess.rb <src file> <language>
+
+	supported languages are:	eng
+
+Dependencies:
+-------------
+
+	* ruby
+	* tesseract-ocr
+	* tesseract language modules:
+		- tesseract-ocr-deu 	(German)
+		- tesseract-ocr-deu-f 	(the German Fraktur script)
+		- tesseract-ocr-eng 	(English)
+		- tesseract-ocr-fra 	(French)
+		- tesseract-ocr-ita 	(Italian)
+		- tesseract-ocr-nld 	(Dutch)
+		- tesseract-ocr-por 	(Brasilian Portuguese)
+		- tesseract-ocr-spa 	(Spanish)
+		- tesseract-ocr-vie 	(Vietnamese)
+	* ghostscript
+	* djvulibre-bin
+	* poppler-utils
+
