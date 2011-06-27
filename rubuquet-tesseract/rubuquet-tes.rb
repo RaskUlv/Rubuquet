@@ -4,7 +4,7 @@
 require 'fileutils'
 
 if ARGV.length == 0 or ARGV.length == 1 or ARGV.length > 2
-  puts "Please, specify a file to OCR or read README file to get help."
+  puts "Please, specify a file to OCR and language or read README file to get help."
   exit
 else
   inFile = ARGV[0]
