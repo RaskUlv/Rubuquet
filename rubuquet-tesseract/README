@@ -3,7 +3,7 @@ rubuquet usage:
 
 	$ ruby rubuquet-tess.rb <src file> <language>
 
-	supported languages are:	eng
+	supported languages are:	eng, deu, deu-f, fra, ita, nld, por, spa, vie
 
 Dependencies:
 -------------
