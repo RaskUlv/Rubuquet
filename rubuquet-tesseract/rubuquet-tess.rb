@@ -11,6 +11,7 @@ else
   argFileExt = File.extname(inFile)
   fileName = File.basename(inFile, ".*")
   fileLang = ARGV[1]
+  fileDir = File.dirname(inFile)
 end
 
 workDir = File.expand_path(File.dirname(__FILE__))
@@ -22,28 +23,29 @@ def pdfInfo( pdFile )
   return IO.popen(system("pdfinfo", inFile).to_s)
 end
 
-def ocr_file( docPages, fileLang, tempDir, workDir, fileName )
-  print "Starting OCR process. Please wait"
+def ocr_file( docPages, fileLang, tempDir, workDir, fileName, fileDir )
+  print "Starting OCR process. Pages left: #{docPages}"
 
   docPages.times {
   |page|
   fmtPage = format("%.4d", "#{page+1}")
   commnd = "tesseract  #{tempDir}/image-#{fmtPage}.tif #{tempDir}/text-#{fmtPage} -l #{fileLang} >> /dev/null 2>> /dev/null"
   system(commnd)
-  if page/5.0 == (page/5).to_i
-    print "."
-  end
+  i =docPages-page
+  n = (docPages.to_s).length
+  iFmt = format("%#{n}d", i)
+  print "\b"*n+"#{iFmt}"
   }
 
-  puts "\nOCR is done: #{fileName}"
-  outFile = File.new("#{workDir}/#{fileName}.txt", "a+")
+  outFile = File.new("#{fileDir}/#{fileName}.txt", "a+")
   srcEnts = Dir.entries( "#{tempDir}" )
   srcFls = srcEnts.grep(/.txt/).sort
   srcFls.each {
   |filetx|
   tempst = File.read("#{tempDir}/#{filetx}")
-  File.open("#{workDir}/#{fileName}.txt", "a+") { |file| file.write tempst }
+  File.open("#{fileDir}/#{fileName}.txt", "a+") { |file| file.write tempst }
   }
+  puts "\nOCR is done: #{fileName}"
   FileUtils.rm_rf(tempDir)
 end
 
@@ -62,7 +64,7 @@ if argFileExt == '.pdf'
   docPages = pages(inFile)
   puts "Preparing to OCR: #{fileName}"
   system("gs", "-r150", "-q", "-sDEVICE=tiffg4", "-dDOINTERPOLATE", "-dNOPAUSE", "-dTextAlphaBits=4", "-dGraphicsAlphaBits=4", "-sOutputFile=#{tempDir}/image-%04d.tif", "--", "#{inFile}")
-  ocr_file(docPages, fileLang, tempDir, workDir, fileName)
+  ocr_file(docPages, fileLang, tempDir, workDir, fileName, fileDir)
 
 ### Work with DJVU file format
 
@@ -71,7 +73,7 @@ elsif argFileExt == '.djvu'
   system("ddjvu", "-format=pdf", "-mode=black", "-quality=100", "#{inFile}", "#{tempDir}/#{fileName}.pdf")
   docPages = pages("#{tempDir}/#{fileName}.pdf")
   system("gs", "-r150", "-q", "-sDEVICE=tiffg4", "-dDOINTERPOLATE", "-dNOPAUSE", "-dTextAlphaBits=4", "-dGraphicsAlphaBits=4", "-sOutputFile=#{tempDir}/image-%04d.tif", "--", "#{tempDir}/#{fileName}.pdf")
-  ocr_file(docPages, fileLang, tempDir, workDir, fileName)
+  ocr_file(docPages, fileLang, tempDir, workDir, fileName, fileDir)
 else
   puts "File type #{argFileExt} not supported"
 end
