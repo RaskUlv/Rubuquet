@@ -15,4 +15,5 @@ Dependencies:
 	* ghostscript
 	* djvulibre-bin
 	* poppler-utils
+	* libpng12
 

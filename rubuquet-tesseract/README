@@ -23,4 +23,7 @@ Dependencies:
 	* ghostscript
 	* djvulibre-bin
 	* poppler-utils
+	* libtiff4
+
+	If you want to have more Tesseract language modules, you should add ppa:nutznboltz/tesseract repository and then install 		additional language modules.
 
