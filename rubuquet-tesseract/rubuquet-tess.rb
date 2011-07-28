@@ -26,8 +26,7 @@ end
 def ocr_file( doc_pages, file_lang, temp_dir, work_dir, file_name, file_dir )
   print "Starting OCR process. Pages left: #{doc_pages}"
 
-  doc_pages.times {
-  |page|
+  doc_pages.times {|page|
   fmt_page = format("%.4d", "#{page+1}")
   commnd = "tesseract  #{temp_dir}/image-#{fmt_page}.tif #{temp_dir}/text-#{fmt_page} -l #{file_lang} >> /dev/null 2>> /dev/null"
   system(commnd)
@@ -40,8 +39,7 @@ def ocr_file( doc_pages, file_lang, temp_dir, work_dir, file_name, file_dir )
   out_file = File.new("#{file_dir}/#{file_name}.txt", "a+")
   src_ents = Dir.entries( "#{temp_dir}" )
   src_fls = src_ents.grep(/.txt/).sort
-  src_fls.each {
-  |filetx|
+  src_fls.each {|filetx|
   tempst = File.read("#{temp_dir}/#{filetx}")
   File.open("#{file_dir}/#{file_name}.txt", "a+") { |file| file.write tempst }
   }
