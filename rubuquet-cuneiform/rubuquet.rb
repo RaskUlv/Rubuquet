@@ -7,74 +7,74 @@ if ARGV.length == 0 or ARGV.length == 1 or ARGV.length > 2
   puts "Please, specify a file to OCR and language or read README file to get help."
   exit
 else
-  inFile = ARGV[0]
-  argFileExt = File.extname(inFile)
-  fileName = File.basename(inFile, ".*")
-  fileLang = ARGV[1]
-  fileDir = File.dirname(inFile)
+  in_file = ARGV[0]
+  arg_file_ext = File.extname(in_file)
+  file_name = File.basename(in_file, ".*")
+  file_lang = ARGV[1]
+  file_dir = File.dirname(in_file)
 end
 
-workDir = File.expand_path(File.dirname(__FILE__))
-tempDir = "/tmp/rubuquet_tmp"
+work_dir = File.expand_path(File.dirname(__FILE__))
+temp_dir = "/tmp/rubuquet_tmp"
 
-FileUtils.mkdir(tempDir) unless Dir.exists?(tempDir)
+FileUtils.mkdir(temp_dir) unless Dir.exists?(temp_dir)
 
-def pdfInfo( pdFile )
-  return IO.popen(system("pdfinfo", inFile).to_s)
+def pdf_info( pdfile )
+  return IO.popen(system("pdfinfo", in_file).to_s)
 end
 
-def ocr_file( docPages, fileLang, tempDir, workDir, fileName, fileDir )
-  print "Starting OCR process. Pages left: #{docPages}"
+def ocr_file( doc_pages, file_lang, temp_dir, work_dir, file_name, file_dir )
+  print "Starting OCR process. Pages left: #{doc_pages}"
 
-  docPages.times {
+  doc_pages.times {
   |page|
-  fmtPage = format("%.4d", "#{page+1}")
-  commnd = "cuneiform #{tempDir}/image-#{fmtPage}.png -l #{fileLang} -o #{tempDir}/text-#{fmtPage}.txt >> /dev/null 2>> /dev/null"
+  fmt_page = format("%.4d", "#{page+1}")
+  commnd = "cuneiform #{temp_dir}/image-#{fmt_page}.png -l #{file_lang} -o #{temp_dir}/text-#{fmt_page}.txt >> /dev/null 2>> /dev/null"
   system(commnd)
-  i =docPages-page
-  n = (docPages.to_s).length
-  iFmt = format("%#{n}d", i)
-  print "\b"*n+"#{iFmt}"
+  i =doc_pages-page
+  n = (doc_pages.to_s).length
+  ifmt = format("%#{n}d", i)
+  print "\b"*n+"#{ifmt}"
   }
 
-  outFile = File.new("#{fileDir}/#{fileName}.txt", "a+")
-  srcEnts = Dir.entries( "#{tempDir}" )
-  srcFls = srcEnts.grep(/.txt/).sort
-  srcFls.each {
+  out_file = File.new("#{file_dir}/#{file_name}.txt", "a+")
+  src_ents = Dir.entries( "#{temp_dir}" )
+  src_fls = src_ents.grep(/.txt/).sort
+  src_fls.each {
   |filetx|
-  tempst = File.read("#{tempDir}/#{filetx}")
-  File.open("#{fileDir}/#{fileName}.txt", "a+") { |file| file.write tempst }
+  tempst = File.read("#{temp_dir}/#{filetx}")
+  File.open("#{file_dir}/#{file_name}.txt", "a+") { |file| file.write tempst }
   }
-  puts "\nOCR is done: #{fileName}"
-  FileUtils.rm_rf(tempDir)
+  puts "\nOCR is done: #{file_name}"
+  FileUtils.rm_rf(temp_dir)
 end
 
-def pages ( pdFile )
-  expar = ["pdfinfo", "#{pdFile}"]
+def pages ( pdfile )
+  expar = ["pdfinfo", "#{pdfile}"]
   f = IO.popen(expar).grep(/Pages:\s\d*/)
-  fString = f[0]
-  pagenums = (/\d*$/).match(fString)
-  pdfPages = pagenums[0].to_i
-  return pdfPages
+  f_string = f[0]
+  pagenums = (/\d*$/).match(f_string)
+  pdf_pages = pagenums[0].to_i
+  return pdf_pages
 end
 
 ### Work with PDF file format
 
-if argFileExt == '.pdf'
-  docPages = pages(inFile)
-  puts "Preparing to OCR: #{fileName}"
-  system("gs", "-r150", "-q", "-sDEVICE=pngmono", "-dDOINTERPOLATE", "-dNOPAUSE", "-dTextAlphaBits=4", "-dGraphicsAlphaBits=4", "-sOutputFile=#{tempDir}/image-%04d.png", "--", "#{inFile}")
-  ocr_file(docPages, fileLang, tempDir, workDir, fileName, fileDir)
+if arg_file_ext == '.pdf'
+  doc_pages = pages(in_file)
+  puts "Preparing to OCR: #{file_name}"
+  system("gs", "-r150", "-q", "-sDEVICE=pngmono", "-dDOINTERPOLATE", "-dNOPAUSE", "-dTextAlphaBits=4", "-dGraphicsAlphaBits=4", "-sOutputFile=#{temp_dir}/image-%04d.png", "--", "#{in_file}")
+  ocr_file(doc_pages, file_lang, temp_dir, work_dir, file_name, file_dir)
 
 ### Work with DJVU file format
 
-elsif argFileExt == '.djvu'
-  puts "Preparing to OCR: #{fileName}"
-  system("ddjvu", "-format=pdf", "-mode=black", "-quality=100", "#{inFile}", "#{tempDir}/#{fileName}.pdf")
-  docPages = pages("#{tempDir}/#{fileName}.pdf")
-  system("gs", "-r150", "-q", "-sDEVICE=pngmono", "-dDOINTERPOLATE", "-dNOPAUSE", "-dTextAlphaBits=4", "-dGraphicsAlphaBits=4", "-sOutputFile=#{tempDir}/image-%04d.png", "--", "#{tempDir}/#{fileName}.pdf")
-  ocr_file(docPages, fileLang, tempDir, workDir, fileName, fileDir)
+elsif arg_file_ext == '.djvu'
+  puts "Preparing to OCR: #{file_name}"
+  system("ddjvu", "-format=pdf", "-mode=black", "-quality=100", "#{in_file}", "#{temp_dir}/#{file_name}.pdf")
+  doc_pages = pages("#{temp_dir}/#{file_name}.pdf")
+  system("gs", "-r150", "-q", "-sDEVICE=pngmono", "-dDOINTERPOLATE", "-dNOPAUSE", "-dTextAlphaBits=4", "-dGraphicsAlphaBits=4", "-sOutputFile=#{temp_dir}/image-%04d.png", "--", "#{temp_dir}/#{file_name}.pdf")
+  ocr_file(doc_pages, file_lang, temp_dir, work_dir, file_name, file_dir)
 else
-  puts "File type #{argFileExt} not supported"
+  puts "File type #{arg_file_ext} not supported"
 end
 

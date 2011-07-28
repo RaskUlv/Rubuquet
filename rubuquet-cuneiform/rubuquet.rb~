@@ -15,7 +15,7 @@ else
 end
 
 work_dir = File.expand_path(File.dirname(__FILE__))
-temp_dir = "/tmp/rubuquettess_tmp"
+temp_dir = "/tmp/rubuquet_tmp"
 
 FileUtils.mkdir(temp_dir) unless Dir.exists?(temp_dir)
 
@@ -28,8 +28,8 @@ def ocr_file( doc_pages, file_lang, temp_dir, work_dir, file_name, file_dir )
 
   doc_pages.times {
   |page|
-  fmt_page = format("%.4d", "#{page+1}")
-  commnd = "tesseract  #{temp_dir}/image-#{fmt_page}.tif #{temp_dir}/text-#{fmt_page} -l #{file_lang} >> /dev/null 2>> /dev/null"
+  fmtPage = format("%.4d", "#{page+1}")
+  commnd = "cuneiform #{temp_dir}/image-#{fmtPage}.png -l #{file_lang} -o #{temp_dir}/text-#{fmtPage}.txt >> /dev/null 2>> /dev/null"
   system(commnd)
   i =doc_pages-page
   n = (doc_pages.to_s).length
@@ -63,7 +63,7 @@ end
 if arg_file_ext == '.pdf'
   doc_pages = pages(in_file)
   puts "Preparing to OCR: #{file_name}"
-  system("gs", "-r150", "-q", "-sDEVICE=tiffg4", "-dDOINTERPOLATE", "-dNOPAUSE", "-dTextAlphaBits=4", "-dGraphicsAlphaBits=4", "-sOutputFile=#{temp_dir}/image-%04d.tif", "--", "#{in_file}")
+  system("gs", "-r150", "-q", "-sDEVICE=pngmono", "-dDOINTERPOLATE", "-dNOPAUSE", "-dTextAlphaBits=4", "-dGraphicsAlphaBits=4", "-sOutputFile=#{temp_dir}/image-%04d.png", "--", "#{in_file}")
   ocr_file(doc_pages, file_lang, temp_dir, work_dir, file_name, file_dir)
 
 ### Work with DJVU file format
@@ -72,7 +72,7 @@ elsif arg_file_ext == '.djvu'
   puts "Preparing to OCR: #{file_name}"
   system("ddjvu", "-format=pdf", "-mode=black", "-quality=100", "#{in_file}", "#{temp_dir}/#{file_name}.pdf")
   doc_pages = pages("#{temp_dir}/#{file_name}.pdf")
-  system("gs", "-r150", "-q", "-sDEVICE=tiffg4", "-dDOINTERPOLATE", "-dNOPAUSE", "-dTextAlphaBits=4", "-dGraphicsAlphaBits=4", "-sOutputFile=#{temp_dir}/image-%04d.tif", "--", "#{temp_dir}/#{file_name}.pdf")
+  system("gs", "-r150", "-q", "-sDEVICE=pngmono", "-dDOINTERPOLATE", "-dNOPAUSE", "-dTextAlphaBits=4", "-dGraphicsAlphaBits=4", "-sOutputFile=#{temp_dir}/image-%04d.png", "--", "#{temp_dir}/#{file_name}.pdf")
   ocr_file(doc_pages, file_lang, temp_dir, work_dir, file_name, file_dir)
 else
   puts "File type #{arg_file_ext} not supported"
